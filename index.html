@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python Coding Quest — Stable</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<style>
+:root{--blue:#1a73e8;--blue2:#e8f0fe;--green:#188038;--red:#c5221f;--gold:#f9ab00;--border:#d7d9dd;--panel:#f4f5f7;--text:#202124;--muted:#6b7280}
+*{box-sizing:border-box} body{margin:0;background:#f7f8fa;font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+.app{max-width:1250px;margin:0 auto;background:#fff;min-height:100vh}.header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap}.logo{font-size:22px;font-weight:700}.xp{margin-left:auto;font-weight:700}.bar{width:150px;height:9px;background:#e5e7eb;border-radius:20px;overflow:hidden}.bar>div{height:100%;width:0;background:var(--blue);transition:.3s}
+.map{padding:14px 18px 16px;border-bottom:1px solid var(--border);background:#fbfcfe}.map-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.map-title{font-size:15px;font-weight:700}.map-subtitle{font-size:12px;color:var(--muted)}.map-grid{display:flex;flex-direction:column;gap:10px}.unit{border:1px solid var(--border);border-radius:10px;background:#fff;padding:10px;min-width:0}.unit-title{font-size:13px;font-weight:700;margin-bottom:8px}.unit-title span{color:var(--muted);font-weight:400}.path{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.node{position:relative;width:50px;height:42px;border-radius:50%;border:2px solid #cfd3d8;background:#f7f8fa;color:#6b7280;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}.node:hover:not(:disabled){transform:translateY(-1px);background:var(--blue2)}.node.current{border-color:var(--blue);background:var(--blue2);color:var(--blue);box-shadow:0 0 0 3px #e8f0fe}.node.done{border-color:#6fba7c;background:#e8f5e9;color:var(--green)}.node.locked{opacity:.5;cursor:not-allowed}.connector{height:2px;flex:1;min-width:7px;background:#d7d9dd}.connector.done{background:#6fba7c}.unlock-note{padding:8px 18px;background:#f8fafc;border-bottom:1px solid var(--border);color:var(--muted);font-size:13px}
+.challenge{padding:16px 18px 10px}.level{font-size:13px;color:var(--muted);text-transform:uppercase;font-weight:700}.title{font-size:25px;font-weight:700;margin:4px 0 8px}.instructions{line-height:1.5;white-space:pre-wrap}.requirements{margin:12px 0;padding-left:22px}.requirements li{margin:5px 0}
+.mode{display:inline-block;margin:8px 0 0;padding:4px 8px;border-radius:12px;background:#eef2ff;color:#374151;font-size:12px;font-weight:700}.prediction{padding:12px 18px;background:#fff8e1;border-top:1px solid #f1df9a;border-bottom:1px solid #f1df9a}.prediction label{font-weight:700;display:block;margin-bottom:7px}.prediction input,.prediction textarea,.prediction select,.reflection textarea{width:100%;max-width:760px;padding:9px;border:1px solid #c8cbd0;border-radius:5px;font:inherit}.reflection{padding:12px 18px;background:#f8fafc;border-top:1px solid var(--border)}.reflection label{font-weight:700;display:block;margin-bottom:7px}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;padding:8px 10px;background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}button{border:1px solid #c8cbd0;background:#fff;border-radius:5px;padding:8px 13px;cursor:pointer;font-size:14px}button:hover{background:#eef0f2}button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}button:disabled{opacity:.5;cursor:default}.status{margin-left:auto;color:var(--muted);font-size:13px;padding:8px}
+.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);border-bottom:1px solid var(--border)}.editor-panel,.output-panel{min-width:0}.output-panel{border-left:1px solid var(--border)}.label{font-weight:700;font-size:13px;padding:7px 10px;background:#fafafa;border-bottom:1px solid var(--border)}.CodeMirror{height:500px;font-size:15px}.output{height:500px;overflow:auto;white-space:pre-wrap;word-break:break-word;padding:12px;background:#111827;color:#f9fafb;font:14px/1.45 "SFMono-Regular",Consolas,monospace}
+.feedback{padding:14px 16px;background:#fff}.feedback.success{background:#e8f5e9;border-left:5px solid var(--green)}.feedback.retry{background:#fff8e1;border-left:5px solid var(--gold)}.feedback.error{background:#fce8e6;border-left:5px solid var(--red)}.feedback h3{margin:0 0 5px}.feedback p{margin:4px 0;white-space:pre-wrap}.hint{display:none;margin-top:9px;padding:9px;background:#f3f4f6;border-radius:5px}.hint.show{display:block}.maze-wrap{padding:12px 18px;background:#f8fafc;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}.maze-title{font-weight:700;margin-bottom:4px}.maze-sub{font-size:13px;color:var(--muted);margin-bottom:10px}.maze{display:grid;grid-template-columns:repeat(var(--maze-cols),28px);gap:2px;width:max-content;padding:6px;background:#d7d9dd;border-radius:6px}.cell{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:16px;background:#fff}.cell.wall{background:#374151}.cell.goal{background:#fff3cd}.cell.start{background:#e0f2fe}.cell.player{background:#dbeafe;box-shadow:inset 0 0 0 3px #2563eb}.cell.visited{box-shadow:inset 0 0 0 2px #93c5fd}.maze-status{margin-top:8px;font-weight:700}.secret-unit{border-color:#b45309;background:#fffbeb}.secret-node{padding:10px 14px;border:2px dashed #b45309;background:#fff7ed;font-weight:700}.secret-node.current{background:#fef3c7}.secret-node.done{border-style:solid}.nextbar{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--border)}.footer{padding:10px 16px;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
+.fullscreen{position:fixed;inset:8px;max-width:none;z-index:9999;overflow:auto}.fullscreen .workspace{height:calc(100vh - 440px)}.fullscreen .CodeMirror,.fullscreen .output{height:100%}
+@media(max-width:800px){.workspace{grid-template-columns:1fr}.output-panel{border-left:0;border-top:1px solid var(--border)}.CodeMirror,.output{height:350px}}
+@media(max-width:600px){.xp{margin-left:0}.status{width:100%;margin-left:0}.CodeMirror,.output{height:300px}.nextbar{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="header"><div class="logo">🐍 Python Coding Quest <span style="font-size:11px;color:#6b7280;font-weight:400">v8 Stable</span></div><div class="xp" id="xp">⭐ 0 XP</div><div class="bar"><div id="progress"></div></div></div>
+  <div class="map" id="questMap">
+    <div class="map-header"><div><div class="map-title">🗺️ Quest Map</div><div class="map-subtitle">Explore the challenges in any order. Completed challenges are marked ✓.</div></div><button id="mapToggle">Hide Map</button></div>
+    <div class="map-grid" id="lessonNav"></div>
+  </div>
+  <div class="challenge"><div class="level" id="level"></div><div class="title" id="title"></div><div class="instructions" id="instructions"></div><div class="mode" id="mode"></div><ul class="requirements" id="requirements"></ul></div>
+  <div id="predictionArea"></div>
+  <div class="toolbar"><button id="run" class="primary">▶ Run & Check</button><button id="reset">↻ Reset</button><button id="hintBtn">💡 Hint</button><button id="clear">Clear Output</button><button id="dark">Dark mode</button><button id="full">⛶ Full screen</button><span class="status" id="status">Loading Python…</span></div>
+  <div class="workspace"><div class="editor-panel"><div class="label">Your Code</div><textarea id="code"></textarea></div><div class="output-panel"><div class="label">Output</div><div class="output" id="output"></div><div class="feedback" id="feedback"><h3>Ready?</h3><p>Modify the code and click <b>Run & Check</b>.</p><div class="hint" id="hint"></div></div></div></div>
+  <div class="nextbar"><button id="prev">← Previous</button><button id="next" class="primary">Next Challenge →</button></div>
+  <div class="footer">Tip: Ctrl+Enter (Windows/Chromebook) or Cmd+Enter (Mac) runs and checks your code. &nbsp; <button id="resetProgress" style="padding:4px 8px;font-size:12px">Reset Progress</button></div>
+</div>
+<script>
+/*
+  PYTHON CODING QUEST — BHNmath-inspired quest sequence
+  Source structure reviewed from the BHNmath coding pages listed in the project.
+  The activities below are original adaptations for this quest interface.
+*/
+window.LESSONS = {};
+window.LEVEL_TITLES={"4":"User Input","5":"The Math Module"};
+function add(id, level, xp, title, type, instructions, requirements, hint, code, tests, successMessage){
+  window.LESSONS[id]={id,level,xp,title,type,typeLabel:type==='predict'?'Prediction Challenge':type==='debug'?'Debugging Challenge':type==='explore'?'Explore & Investigate':'Coding Challenge',instructions,requirements,hint,code,tests,successMessage};
+}
+
+// ============================================================
+// LEVEL 1 — DISPLAYING RESULTS
+// ============================================================
+add('input_1',4,75,'Nice to Meet You','predict','Predict the output when the program uses a stored name.',[
+  'Predict the output before running.',
+  'Then run it to check.'
+],'The value stored in name is inserted into the print statement.',`name = "Jordan"\nprint("Nice to meet you,", name)`,[{type:'predictionEquals',text:'Nice to meet you, Jordan'},{type:'outputContains',text:'Jordan'}],'Good prediction!');
+add('input_2',4,100,'Who Are You?','guided','Change the program so it uses input() to ask the user for their name.',[
+  'Use input().',
+  'Store the answer in a variable.',
+  'Print a greeting using that variable.'
+],'Try: name = input("What is your name?")',`name = input("What is your name? " )\n# Type the greeting code here`,[{type:'codeContains',patterns:['\\binput\\s*\\(']},{type:'codeContains',patterns:['\\bprint\\s*\\(']}],'Your program can now receive information from the user.');
+add('input_3',4,100,'Your Turn: Day of the Week','guided','Create a program that asks for a day of the week and says that the entered day is a great day to do math.',[
+  'Prompt the user for the day.',
+  'Store the input in a variable.',
+  'Include the entered day in the output.'
+],'Use input() and then include the variable in print().',`day = input("Enter a day: ")\n# Type the output code here`,[{type:'codeContains',patterns:['\\binput\\s*\\(']},{type:'codeContains',patterns:['\\bprint\\s*\\(']},{type:'codeContains',patterns:['\\bday\\b']}],'Great! You created an interactive program.');
+add('input_4',4,100,'Heart Rate','response','Identify the calculation used to determine maximum heart rate.',[
+  'Type the calculation for maximum heart rate in the answer box.',
+  'Use the variables shown in the program to help you.'
+],'Maximum heart rate is calculated by subtracting age from 220.',`age = 40\nmaximum_heart_rate = 220 - age\nprint("Maximum heart rate:", maximum_heart_rate)`,[{type:'responseContains',patterns:['220\\s*-\\s*age']},{type:'outputContains',text:'180'}],'You connected variables to a real-world calculation.');
+add('input_5',4,125,'Integer Adjustment','guided','Modify the program so the user enters an age and Python treats that input as an integer.',[
+  'Use input().',
+  'Use int() around the input.',
+  'Calculate maximum heart rate.'
+],'input() returns text. int() converts suitable text to an integer.',`# Ask the user for their age and store it as an integer.\n# Then use the equation below to calculate and display maximum heart rate.\nmaximum_heart_rate = 220 - age\nprint("Maximum heart rate:", maximum_heart_rate)`,[{type:'codeContains',patterns:['int\\s*\\(\\s*input\\s*\\(']},{type:'codeContains',patterns:['220\\s*-\\s*age']}],'You converted user input to an integer and used it in a calculation.');
+add('input_6',4,125,'Floating Point','guided','Modify the heart-rate program so the user can enter a decimal age.',[
+  'Use float() with input().',
+  'Calculate the maximum heart rate.',
+  'Display the result.'
+],'Use float(input(...)) when the input may contain a decimal.',`age = input("What is your age? ")\nmaximum_heart_rate = 220 - age\nprint("Maximum heart rate:", maximum_heart_rate)`,[{type:'codeContains',patterns:['float\\s*\\(\\s*input\\s*\\(']},{type:'codeContains',patterns:['220\\s*-\\s*age']},{type:'codeContains',patterns:['\\bprint\\s*\\(']}],'You can now work with decimal user input.');
+add('input_7',4,150,'Triangle Area','guided','Create a program that asks for the base and height of a triangle in centimetres and displays its area rounded to one decimal place.',[
+  'Allow decimal input for base and height.',
+  'Calculate area using 1/2 × base × height.',
+  'Round to one decimal place.',
+  'Include square centimetres in the output.'
+],'Use float(input(...)) for both measurements.',`# Type the code here`,[{type:'codeContains',patterns:['float\\s*\\(\\s*input\\s*\\(']},{type:'codeContains',patterns:['round\\s*\\(']},{type:'codeContains',patterns:['(?:0\.5|1\s*/\s*2)']},{type:'outputContains',text:'square centimetres'}],'🎯 User Input level complete! Your programs can collect and process user data.');
+
+// ============================================================
+// LEVEL 5 — THE MATH MODULE
+// ============================================================
+add('math_1',5,75,'A New Tool','predict','Predict the output and identify what math.sqrt() does.',[
+  'Predict the output.',
+  'Run the program.',
+  'Explain what sqrt calculates in your own notes.'
+],'sqrt means square root.',`import math\nx = math.sqrt(25)\nprint(x)`,[{type:'predictionEquals',text:'5.0'},{type:'outputRegex',pattern:'^5(?:\\.0)?$'}],'You used the math module to calculate a square root.');
+add('math_2',5,75,'Over the Top?','explore','Investigate why math.sqrt() works while sqrt() alone does not in the starting program.',[
+  'Run the original code.',
+  'Try removing math. from math.sqrt().',
+  'Observe what happens.',
+  'Try removing the import line while keeping math.sqrt(). What error appears? Then restore the import line.'
+],'The import line makes the math module available. The math. prefix tells Python to use sqrt() from that module.',`import math\nx = sqrt(25)\nprint(x)`,[{type:'outputRegex',pattern:'^5(?:\\.0)?$'},{type:'codeContains',patterns:['import\\s+math']},{type:'codeContains',patterns:['math\\.sqrt']}],'You investigated how importing a module gives Python access to its tools.');
+add('math_3',5,100,'Root of the Problem','debug','Fix the two errors in Rachel’s square-side program.',[
+  'Import the math module correctly.',
+  'Use math.sqrt() correctly.',
+  'Display the side length.'
+],'Look at the import statement and the name used to call sqrt().',`import maths\narea = 144\nside = math.sqrt(area)\nprint("Side:", side)`,[{type:'outputContains',text:'12.0'},{type:'codeContains',patterns:['import\\s+math']},{type:'codeContains',patterns:['math\\.sqrt\\s*\\(']}],'You repaired a program that uses a Python module.');
+add('math_4',5,100,'Secure the Perimeter','guided','Modify the square program so it outputs the perimeter instead of the side length.',[
+  'Calculate the side length from the area.',
+  'Calculate the perimeter from the side length.',
+  'Display the perimeter.'
+],'A square perimeter is 4 × side.',`import math\narea = 144\nside = math.sqrt(area)\n# Calculate and display the perimeter here`,[{type:'variableEquals',name:'perimeter',expected:48},{type:'outputContains',text:'48'}],'You combined a module function with a geometric calculation.');
+add('math_5',5,100,'A Whole New Toolbox','explore','Explore constants and functions from the math module, including math.pi.',[
+  'Import math.',
+  'Display math.pi.',
+  'Compare it with 3.14.'
+],'math.pi gives a much more precise value of π than 3.14.',`import math\n# Explore a constant or function from the math module here`,[{type:'codeContains',patterns:['import\\s+math']},{type:'codeContains',patterns:['math\\.pi']},{type:'outputContains',text:'3.14159'}],'You discovered a useful mathematical constant.');
+add('math_6',5,125,'Another Slice of Pi','guided','Modify the circle-area program so it uses math.pi instead of 3.14 and displays the answer to two decimal places.',[
+  'Import math.',
+  'Use the circle area formula A = πr².',
+  'Use math.pi in the area formula.',
+  'Use the radius variable.',
+  'Round the area to exactly two decimal places.',
+  'Display the area.'
+],'Replace the approximation 3.14 with math.pi. Use round(value, 2) so the answer is shown to two decimal places.',`import math\nradius = 5\n# Calculate the circle area using math.pi and display it here`,[{type:'codeContains',patterns:['import\\s+math']},{type:'codeContains',patterns:['math\\.pi']},{type:'outputContains',text:'78.54'}],'You used math.pi for a more accurate circle calculation.');
+add('math_7',5,125,'Speaking Volumes','guided','Calculate the volume of a cylinder using radius and height values.',[
+  'Use radius and height variables.',
+  'Use V = πr²h.',
+  'Use math.pi.',
+  'Round the volume to one decimal place.'
+],'The cylinder volume formula is V = πr²h.',`import math\nradius = 2\nheight = 5\n# Calculate and display the cylinder volume here`,[{type:'variableExists',name:'radius'},{type:'variableExists',name:'height'},{type:'variableExists',name:'volume'},{type:'codeContains',patterns:['math\\.pi']},{type:'codeContains',patterns:['round\\s*\\(']},{type:'outputContains',text:'62.8'}],'You used the math module to solve a three-dimensional problem.');
+add('math_8',5,150,'Minimum Perimeter Challenge','boss','Use your program to determine the minimum perimeter of a rectangle with an area of 812.25 m². What are the dimensions of this rectangle? Your final answer should give the minimum perimeter.',[
+  'Write the full program yourself.',
+  'Use the math module and math.sqrt().',
+  'Determine the dimensions of the rectangle with minimum perimeter.',
+  'Calculate the minimum perimeter.',
+],'For a fixed area, the rectangle with minimum perimeter is a square. Use the area to determine the side length, then calculate the perimeter.',`# Type the full program here`,[{type:'codeContains',patterns:['import\\s+math']},{type:'codeContains',patterns:['math\\.sqrt']},{type:'outputContains',text:'114'},{type:'outputContains',text:'m'}],'🏆 Math Module boss complete! You used variables, the math module, and geometry together.');
+
+// ============================================================
+// LEVEL 6 — FOR LOOPS
+// ============================================================
+
+</script>
+<script>
+let pyodide=null,editor=null,lesson=null,starterCode="",pythonLoading=false;
+window.addEventListener("error",function(e){
+  const s=document.getElementById("status");
+  if(s && !pyodide){s.textContent="Page error — refresh to retry";}
+  console.error(e.error||e.message);
+});
+window.addEventListener("unhandledrejection",function(e){
+  const s=document.getElementById("status");
+  if(s)s.textContent="Loading error — refresh to retry";
+  console.error(e.reason);
+});
+const output=document.getElementById("output"),status=document.getElementById("status");
+function q(name){return new URLSearchParams(location.search).get(name)}
+function go(id){location.href=location.pathname+"?lesson="+encodeURIComponent(id)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function normalize(s){return String(s).replace(/\r/g,"").trim().replace(/[ \t]+$/gm,"")}
+function write(s){output.textContent+=String(s);if(!String(s).endsWith("\n"))output.textContent+="\n";output.scrollTop=output.scrollHeight}
+function getDone(){
+  try{
+    const current=JSON.parse(localStorage.getItem("pythonQuestCompletedV2_repo2_levels_4_5")||"null");
+    if(current && typeof current==="object") return current;
+    const legacy=JSON.parse(localStorage.getItem("pythonQuestCompleted")||"{}");
+    const migrated={};
+    Object.keys(legacy||{}).forEach(id=>{if(window.LESSONS&&window.LESSONS[id]) migrated[id]=true});
+    if(Object.keys(migrated).length) localStorage.setItem("pythonQuestCompletedV2_repo2_levels_4_5",JSON.stringify(migrated));
+    return migrated;
+  }catch(e){return {}}
+}
+function isUnlocked(id){return !!(window.LESSONS&&window.LESSONS[id])}
+function questIds(){return Object.keys(window.LESSONS||{}).filter(id=>!window.LESSONS[id].secret)}
+function regularComplete(){const done=getDone(),ids=questIds();if(!ids.length)return false;const maxLevel=Math.max(...ids.map(id=>Number(window.LESSONS[id].level)||0));const finalIds=ids.filter(id=>Number(window.LESSONS[id].level)===maxLevel);return finalIds.length>0 && finalIds.every(id=>done[id]);}
+function renderNav(){
+  const nav=document.getElementById("lessonNav");
+  const done=getDone(); nav.innerHTML="";
+  const groups={};
+  questIds().forEach(id=>{const l=window.LESSONS[id];(groups[l.level] ||= []).push(l);});
+  const levelTitles=window.LEVEL_TITLES||{};
+  Object.keys(groups).sort((a,b)=>Number(a)-Number(b)).forEach(level=>{
+    const lessons=groups[level];
+    const box=document.createElement("div"); box.className="unit";
+    const heading=document.createElement("div"); heading.className="unit-title"; heading.textContent=`Level ${level} • ${levelTitles[level]||"Coding"}`; box.appendChild(heading);
+    const path=document.createElement("div"); path.className="path";
+    lessons.forEach((l,idx)=>{
+      const b=document.createElement("button");b.className="node"+(l.id===lesson.id?" current":"")+(done[l.id]?" done":"");
+      b.title=lessonLabel(l.id)+" – "+l.title;b.textContent=done[l.id]?"✓":lessonLabel(l.id).replace("Level ","");b.onclick=()=>go(l.id);path.appendChild(b);
+      if(idx<lessons.length-1){const c=document.createElement("div");c.className="connector"+(done[l.id]?" done":"");path.appendChild(c)}
+    });
+    box.appendChild(path);nav.appendChild(box);
+  });
+  if(window.SECRET_BOSS && regularComplete()){
+    const boss=window.LESSONS[window.SECRET_BOSS.id],box=document.createElement("div");box.className="unit secret-unit";
+    const heading=document.createElement("div");heading.className="unit-title";heading.textContent="🔒 SECRET BOSS BATTLE";box.appendChild(heading);
+    const b=document.createElement("button");b.className="secret-node"+(done[boss.id]?" done":"")+(boss.id===lesson.id?" current":"");b.textContent=done[boss.id]?"🏆 Defeated!":"??? Secret Boss ???";b.onclick=()=>go(boss.id);box.appendChild(b);nav.appendChild(box);
+  }
+}
+
+function renderSpecialArea(){
+  const area=document.getElementById("predictionArea");
+  if(!area)return;
+  area.innerHTML="";
+  if(lesson && lesson.type==="predict"){
+    area.innerHTML='<div class="prediction"><label for="prediction">🔮 Your Prediction</label><textarea id="prediction" rows="5" placeholder="Type exactly what you think the program will output. Use a new line for each output line."></textarea></div>';
+  }else if(lesson && lesson.type==="response"){
+    area.innerHTML='<div class="prediction"><label for="response">✍️ Your Answer</label><textarea id="response" rows="3" placeholder="Type your answer here..."></textarea></div>';
+  }else if(lesson && lesson.type==="secret"){
+    renderMaze();
+  }
+}
+function renderMaze(){
+  const area=document.getElementById("predictionArea");
+  if(!area || !lesson || !lesson.maze)return;
+  const rows=lesson.maze.rows, start=lesson.maze.start, goal=lesson.maze.goal;
+  let html='<div class="maze-wrap"><div class="maze-title">🗝️ Secret Boss: Maze Escape</div><div class="maze-sub">Write <code>moves</code> as a string using U, D, L and R. Your code will control the explorer.</div><div class="maze" id="mazeGame" style="--maze-cols:'+rows[0].length+'">';
+  rows.forEach((row,r)=>[...row].forEach((cell,c)=>{let cls=cell==="#"?"wall":cell==="G"?"goal":cell==="S"?"start":"floor";let icon=cell==="G"?"🏁":cell==="S"?"🚀":"";html+='<div class="cell '+cls+'" data-r="'+r+'" data-c="'+c+'">'+icon+'</div>';}));
+  html+='</div><div class="maze-status" id="mazeStatus">Reach the flag without hitting a wall.</div></div>';
+  area.innerHTML=html;
+}
+async function animateMaze(moves){
+  const g=lesson.maze, cells=[...document.querySelectorAll('#mazeGame .cell')];
+  let r=g.start[0],c=g.start[1];
+  const get=(rr,cc)=>cells.find(x=>Number(x.dataset.r)===rr&&Number(x.dataset.c)===cc);
+  const resetCell=(cell)=>{if(!cell)return;const rr=Number(cell.dataset.r),cc=Number(cell.dataset.c);const original=g.rows[rr][cc];cell.textContent=original==='G'?'🏁':original==='S'?'🚀':'';};
+  cells.forEach(x=>{x.classList.remove('player','visited');resetCell(x);});
+  const startCell=get(r,c);
+  if(startCell){startCell.classList.add('player');startCell.textContent='🚀';}
+  for(const m of String(moves)){
+    await new Promise(res=>setTimeout(res,140));
+    const d={U:[-1,0],D:[1,0],L:[0,-1],R:[0,1]}[m];
+    if(!d)continue;
+    const old=get(r,c);
+    r+=d[0];c+=d[1];
+    old?.classList.add('visited');
+    resetCell(old);
+    const current=get(r,c);
+    if(current){current.classList.add('player');current.textContent=(r===g.goal[0]&&c===g.goal[1])?'🚀':'🚀';}
+  }
+}
+
+function lessonLabel(id){const target=window.LESSONS[id];if(!target)return "";if(target.secret)return "Secret Boss";const same=questIds().map(x=>window.LESSONS[x]).filter(x=>x.level===target.level);const n=same.findIndex(x=>x.id===id)+1;return "Level "+target.level+"-"+n;}
+
+function loadLesson(){
+  const ids=questIds(),requested=q("lesson");
+  let safeId=(requested&&window.LESSONS[requested]&&(!window.LESSONS[requested].secret || regularComplete()))?requested:ids[0];
+  lesson=window.LESSONS[safeId]||window.LESSONS[ids[0]];
+  if(requested!==safeId) history.replaceState({},"",location.pathname+"?lesson="+encodeURIComponent(safeId));
+  starterCode=lesson.code||"";
+  document.getElementById("level").textContent=lesson.secret?"SECRET BOSS • "+lesson.xp+" XP":lessonLabel(lesson.id)+" • "+lesson.xp+" XP";
+  document.getElementById("title").textContent=lesson.title;
+  document.getElementById("instructions").textContent=lesson.instructions||"";
+  document.getElementById("mode").textContent=lesson.typeLabel||"Coding Challenge";
+  document.getElementById("requirements").innerHTML=(lesson.requirements||[]).map(x=>"<li>"+esc(x)+"</li>").join("");
+  editor.setValue(starterCode);output.textContent="";renderSpecialArea();resetFeedback();renderNav();updateXP();updateNavButtons();editor.refresh();
+}
+
+function resetFeedback(){const f=document.getElementById("feedback");f.className="feedback";f.innerHTML='<h3>Ready?</h3><p>'+esc(lesson.readyMessage||"Modify the code and click Run & Check.")+'</p><div class="hint" id="hint">'+esc(lesson.hint||"")+'</div>';}
+async function loadPython(){
+  if(pythonLoading || pyodide)return;
+  pythonLoading=true;
+  const runBtn=document.getElementById("run");
+  try{
+    runBtn.disabled=true;
+    status.textContent="Loading Python…";
+    if(typeof loadPyodide!=="function") throw new Error("The Python engine did not load from the Pyodide CDN.");
+    pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.27.2/full/"});
+    status.textContent="Python ready";
+    runBtn.disabled=false;
+  }catch(e){
+    pyodide=null;
+    status.textContent="Python failed to load";
+    write("Python could not be loaded. Check your internet connection, then refresh the page.\n"+String(e));
+    runBtn.disabled=false;
+    runBtn.textContent="↻ Retry Python";
+  }finally{pythonLoading=false;}
+}
+
+window.SECRET_BOSS=window.SECRET_BOSS||{};
+function installSecretBoss(config){
+  window.SECRET_BOSS=config;
+  window.LESSONS[config.id]={id:config.id,secret:true,xp:config.xp||300,title:config.title,type:'secret',typeLabel:'SECRET BOSS',instructions:config.instructions,requirements:config.requirements,hint:config.hint,code:'# Write your move sequence here\n',tests:[{type:'mazeMoves'}],successMessage:config.successMessage,maze:config.maze};
+}
+installSecretBoss({"id": "secret_2", "xp": 350, "title": "Maze Escape II", "instructions": "The maze is bigger this time. Write moves as a string of U, D, L and R and guide the explorer to the flag.", "requirements": ["Create a variable named moves.", "Use only U, D, L and R.", "Reach the flag without hitting a wall."], "hint": "Plan the route before you run it. The shortest route is not always the easiest route to spot.", "successMessage": "🏆 Secret boss defeated! You escaped the maze!", "maze": {"rows": ["###############", "#S#...#...#...#", "#.#.#.#.#.#.###", "#.#.#.#.#.#...#", "#.#.#.#.#.###.#", "#...#...#.#...#", "#########.#.#.#", "#.....#.#...#.#", "#.###.#.#####.#", "#...#.#.#.....#", "###.#.#.#.#####", "#...#...#.#...#", "#.#######.#.#.#", "#...........#G#", "###############"], "start": [1, 1], "goal": [13, 13]}});
+function setupInput(){
+  pyodide.runPython(`import builtins, js
+
+def _quest_input(prompt=""):
+    value = js.window.prompt(str(prompt))
+    return "" if value is None else value
+builtins.input = _quest_input`);
+}
+async function runCheck(){
+  if(!pyodide){status.textContent="Python is not ready. Click Retry Python.";return;}
+  const runBtn=document.getElementById("run");runBtn.disabled=true;output.textContent="";status.textContent="Running…";
+  const code=editor.getValue();let captured="";
+  try{
+    setupInput();
+    const wrapped=`import io, contextlib\n_quest_out=io.StringIO()\n_quest_err=io.StringIO()\ntry:\n    with contextlib.redirect_stdout(_quest_out), contextlib.redirect_stderr(_quest_err):\n        exec(compile(${JSON.stringify(code)}, '<student>', 'exec'), globals(), globals())\nfinally:\n    _quest_captured=_quest_out.getvalue()+_quest_err.getvalue()`;
+    try{
+      await pyodide.runPythonAsync(wrapped);
+    }catch(e){
+      try{captured=String(await pyodide.runPythonAsync("_quest_captured"));}catch(_){captured="";}
+      if(captured)write(captured);
+      write("Error:\n"+e);
+      showFeedback({pass:false,title:"🟡 Code Error",message:"Python could not finish running this program.",hint:lesson.errorHint||lesson.hint});
+      status.textContent="Code error";
+      return;
+    }
+    captured=String(await pyodide.runPythonAsync("_quest_captured"));
+    if(lesson.type==="secret"){
+      write(captured || "🚀 Move sequence detected! Checking your route...");
+    }else{
+      if(captured)write(captured);else write("Program finished with no output.");
+    }
+    const result=await runTests(code,captured);
+    if(lesson.type==="secret" && result.pass){
+      write("🏆 SECRET BOSS DEFEATED! The explorer reached the flag!");
+    }else if(lesson.type==="secret" && !result.pass){
+      write("💥 The explorer did not reach the flag. Check your moves and try again.");
+    }
+    showFeedback(result);status.textContent=result.pass?"Challenge complete!":"Try again";
+  }catch(e){if(captured)write(captured);write("Error:\n"+e);showFeedback({pass:false,title:"🟡 Code Error",message:"Python could not finish running this program.",hint:lesson.errorHint||lesson.hint});status.textContent="Code error";}
+  finally{runBtn.disabled=false;}
+}
+async function runTests(code,captured){
+  const tests=lesson.tests||[],failures=[];
+  for(const t of tests){try{
+    if(t.type==="variableExists"){
+      const exists=await pyodide.runPythonAsync(`bool(${JSON.stringify(t.name)} in globals())`);if(!exists)failures.push(t.message||`Create a variable called ${t.name}.`);
+    }else if(t.type==="variableNonEmpty"){
+      const ok=await pyodide.runPythonAsync(`bool(${JSON.stringify(t.name)} in globals() and str(globals().get(${JSON.stringify(t.name)})).strip())`);if(!ok)failures.push(t.message||`Give ${t.name} a value instead of leaving it blank.`);
+    }else if(t.type==="outputContainsVariable"){
+      const val=await pyodide.runPythonAsync(`str(globals().get(${JSON.stringify(t.name)}, ""))`);if(!normalize(captured).includes(normalize(val)))failures.push(t.message||`Make sure your output uses the value stored in ${t.name}.`);
+    }else if(t.type==="radiusValue"){
+      const found=await pyodide.runPythonAsync(`any(isinstance(v,(int,float)) and abs(v-8.5)<1e-9 for k,v in globals().items() if k!="area" and not k.startswith("_") )`);if(!found)failures.push(t.message||"Use a variable to store the radius value 8.5.");
+    }else if(t.type==="variableEquals"){
+      const val=await pyodide.runPythonAsync(`globals().get(${JSON.stringify(t.name)}, None)`);const expected=t.expected;if(typeof expected==='number'){if(typeof val!=='number' || Math.abs(Number(val)-expected)>1e-6)failures.push(t.message||`Check the value of ${t.name}.`);}else if(String(val)!==String(expected))failures.push(t.message||`Check the value of ${t.name}.`);
+    }else if(t.type==="outputContains"){
+      if(!normalize(captured).includes(normalize(t.text)))failures.push(t.message||`Your output should contain: ${t.text}`);
+    }else if(t.type==="outputEquals"){
+      if(normalize(captured)!==normalize(t.text))failures.push(t.message||"The output is not quite right.");
+    }else if(t.type==="outputRegex"){
+      if(!(new RegExp(t.pattern,"m")).test(normalize(captured)))failures.push(t.message||"Check the format of your output.");
+    }else if(t.type==="codeContains"){
+      if(!t.patterns.some(p=>new RegExp(p,"m").test(code)))failures.push(t.message||"Make sure you use the required Python concept.");
+    }else if(t.type==="codeMustNotContain"){
+      if(t.patterns.some(p=>new RegExp(p,"m").test(code)))failures.push(t.message||"Try solving this using the concept from the lesson rather than hard-coding the answer.");
+    }else if(t.type==="responseContains"){
+      const p=document.getElementById("response")?.value||"";if(!t.patterns.some(x=>new RegExp(x,"i").test(p)))failures.push(t.message||"Your answer does not contain the expected calculation.");
+    }else if(t.type==="mazeMoves"){
+      let moves=String(await pyodide.runPythonAsync(`str(globals().get("moves", ""))`)).trim().toUpperCase();
+      moves=moves.replace(/\s+/g,"");
+      const rows=lesson.maze.rows;let r=lesson.maze.start[0],c=lesson.maze.start[1],hitWall=false,badMove=false;
+      if(!moves){failures.push("Create a moves variable containing a sequence of U, D, L and R.");}
+      for(const m of moves){const d={U:[-1,0],D:[1,0],L:[0,-1],R:[0,1]}[m];if(!d){badMove=true;break;}r+=d[0];c+=d[1];if(r<0||c<0||r>=rows.length||c>=rows[0].length||rows[r][c]==="#"){hitWall=true;break;}}
+      if(badMove)failures.push("Use only U, D, L and R in your moves string.");
+      else if(hitWall)failures.push("💥 Your explorer hit a wall. Adjust your moves and try again.");
+      else if(r!==lesson.maze.goal[0] || c!==lesson.maze.goal[1])failures.push("The explorer did not reach the flag. Keep going — your route stops at row "+(r+1)+", column "+(c+1)+".");
+      else {const ms=document.getElementById("mazeStatus");if(ms)ms.textContent="🚀 Route valid! Watch the explorer escape...";setTimeout(()=>animateMaze(moves),30);}
+    }else if(t.type==="predictionEquals"){
+      const p=document.getElementById("prediction")?.value||"";if(normalize(p)!==normalize(t.text))failures.push(t.message||"Your prediction did not match the expected output.");
+    }else if(t.type==="predictionNumberEquals"){
+      const p=document.getElementById("prediction")?.value||"";const expected=Number(t.value);const actual=Number(String(p).trim());if(!Number.isFinite(actual)||actual!==expected)failures.push(t.message||"Your prediction did not match the expected number. Enter 5 or 5.0.");
+    }else if(t.type==="predictionContains"){
+      const p=document.getElementById("prediction")?.value||"";if(!normalize(p).includes(normalize(t.text)))failures.push(t.message||"Include the expected result in your prediction.");
+    }else if(t.type==="codeLineCountAtMost"){
+      const lines=code.split(/\n/).filter(x=>x.trim()!=="").length;if(lines>t.max)failures.push(t.message||`Try to solve this in ${t.max} lines or fewer.`);
+    }
+  }catch(e){failures.push(t.message||"One of the checks could not be completed.");}}
+  return failures.length?{pass:false,title:"🟡 Keep Going!",message:failures.join("\n"),hint:lesson.hint||""}:{pass:true,title:"🎉 Challenge Complete!",message:lesson.successMessage||"Excellent work!",xp:Number(lesson.xp)||100};
+}
+function showFeedback(r){const f=document.getElementById("feedback");if(r.pass){f.className="feedback success";f.innerHTML='<h3>'+esc(r.title)+'</h3><p>'+esc(r.message)+'</p><p><b>⭐ +'+r.xp+' XP</b></p>';saveCompletion()}else{f.className="feedback retry";f.innerHTML='<h3>'+esc(r.title)+'</h3><p>'+esc(r.message)+'</p><div class="hint show"><b>💡 Hint:</b> '+esc(r.hint||"Read the requirements and check your code carefully.")+'</div>';}}
+function saveCompletion(){const done=getDone();if(!done[lesson.id]){done[lesson.id]=true;localStorage.setItem("pythonQuestCompletedV2_repo2_levels_4_5",JSON.stringify(done));}updateXP();renderNav();updateNavButtons();}
+function updateXP(){const done=getDone(),completed=Object.keys(done).filter(id=>window.LESSONS&&window.LESSONS[id]),total=completed.reduce((sum,id)=>sum+(Number(window.LESSONS[id].xp)||0),0),regular=questIds(),regularDone=regular.filter(id=>done[id]);document.getElementById("xp").textContent="⭐ "+total+" XP";document.getElementById("progress").style.width=(regular.length?Math.min(100,regularDone.length/regular.length*100):0)+"%";document.getElementById("xp").title=regularDone.length+" of "+regular.length+" challenges completed";}
+function updateNavButtons(){
+  const ids=questIds(),i=ids.indexOf(lesson.id);
+  document.getElementById("prev").disabled=i<=0;
+  document.getElementById("next").disabled=i>=ids.length-1;
+  document.getElementById("next").textContent=i>=ids.length-1?"End of Quest 🎉":"Next Challenge →";
+}
+function change(delta){const ids=questIds(),i=ids.indexOf(lesson.id),j=i+delta;if(j>=0&&j<ids.length)go(ids[j])}
+function resetProgress(){if(confirm("Reset all Python Coding Quest progress and XP on this device?")){localStorage.removeItem("pythonQuestCompleted");localStorage.removeItem("pythonQuestCompletedV2_repo2_levels_4_5");location.href=location.pathname+"?lesson="+encodeURIComponent(Object.keys(window.LESSONS)[0])}}
+document.getElementById("mapToggle").onclick=()=>{const map=document.getElementById("lessonNav"),btn=document.getElementById("mapToggle");const hidden=map.style.display==="none";map.style.display=hidden?"grid":"none";btn.textContent=hidden?"Hide Map":"Show Map"};
+document.getElementById("run").onclick=()=>{if(!pyodide){loadPython();}else{runCheck();}};document.getElementById("reset").onclick=()=>{editor.setValue(starterCode);output.textContent="";renderSpecialArea();resetFeedback();editor.focus()};document.getElementById("clear").onclick=()=>output.textContent="";document.getElementById("hintBtn").onclick=()=>{let h=document.getElementById("hint");if(!h){const f=document.getElementById("feedback");h=document.createElement("div");h.id="hint";h.className="hint";h.innerHTML="<b>💡 Hint:</b> "+esc(lesson?.hint||"Read the requirements and check your code carefully.");f.appendChild(h)}h.classList.toggle("show")};document.getElementById("dark").onclick=e=>{const dark=document.querySelector(".CodeMirror").classList.contains("cm-s-material-darker");editor.setOption("theme",dark?"default":"material-darker");e.target.textContent=dark?"Dark mode":"Light mode";editor.refresh()};document.getElementById("full").onclick=()=>{document.getElementById("app").classList.toggle("fullscreen");editor.refresh()};document.getElementById("prev").onclick=()=>change(-1);document.getElementById("next").onclick=()=>change(1);document.getElementById("resetProgress").onclick=resetProgress;document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runCheck()}});
+try{
+  editor=CodeMirror.fromTextArea(document.getElementById("code"),{mode:"python",theme:"default",lineNumbers:true,indentUnit:4,tabSize:4,autofocus:true});
+}catch(e){
+  document.getElementById("status").textContent="Editor library failed to load";
+}
+try{
+  loadLesson();
+}catch(e){
+  document.getElementById("status").textContent="Quest data failed to load";
+  console.error(e);
+}
+loadPython();
+</script>
+</body>
+</html>
